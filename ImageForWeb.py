@@ -19,7 +19,7 @@ except ImportError:
 # RECUPERATION DES FICHIERS JPG DANS LE DOSSIER
 files = glob.glob('*.jpg')
 
-print "Bienvenue sur le logiciel de publication de Shining Paradox ! Ce logiciel permet de reduire la taille de vos fichiers et de mettre une watermark en bas a gauche de vos photos !"
+print "\n\nBienvenue sur le logiciel de publication de Shining Paradox ! Ce logiciel permet de reduire la taille de vos fichiers et de mettre une watermark en bas a gauche de vos photos !"
 print "Avant de commencer voici quelques instructions :"
 print "1/ Lancez le logiciel dans le dossier contenant vos images"
 print "2/ Si vous souhaitez ajouter une watermak, rajoutez un fichier 'watermak.png' avec vos autres images"
@@ -36,6 +36,13 @@ if watermark == 'y':
     # VERIFIE SI UNE WATERMARK EST DANS LE DOSSIER
     if os.path.isfile("watermark.png"):
         watermarkImage = Image.open("watermark.png")
+        print "+-----+"
+        print "|1   2|"
+        print "|  5  |"
+        print "|3   4|"
+        print "+-----+"
+        positionWatermark = raw_input("Position de la watermark ? (1-4) : ")
+        positionWatermark = int(positionWatermark)
     else:
         sys.exit("""Le fichier 'watermark.png' n'existe pas dans le dossier !""")
 
@@ -54,7 +61,14 @@ for fileName in files:
 
     # WATERMARK
     if watermark == 'y':
-        img.paste(watermarkImage, (10, 10), watermarkImage)
+        if positionWatermark == 1:
+            img.paste(watermarkImage, (10, 10), watermarkImage)
+        elif positionWatermark == 2:
+            img.paste(watermarkImage, (img.size[0] - 10 - watermarkImage.size[0], 10), watermarkImage)
+        elif positionWatermark == 3:
+            img.paste(watermarkImage, (10, img.size[1] - 10 - watermarkImage.size[1]), watermarkImage)
+        elif positionWatermark == 4:
+            img.paste(watermarkImage, (img.size[0] - 10 - watermarkImage.size[0], img.size[1] - 10 - watermarkImage.size[1]), watermarkImage)
 
     # RESIZE
     # Largeur max
@@ -67,5 +81,13 @@ for fileName in files:
         img = img.resize((wsize, maxSize), PIL.Image.ANTIALIAS)
     else:
         img = img.resize((maxSize, hsize), PIL.Image.ANTIALIAS)
+
+    # La position 5 est ici pour garder le logo dans une grande taille
+    if  watermark == 'y' and positionWatermark == 5:
+        wpercent = ((int(img.size[0]*0.6) / float(watermarkImage.size[0])))
+        hsize = int(watermarkImage.size[1] * float(wpercent))
+        watermarkImage = watermarkImage.resize((int(img.size[0]*0.6), hsize), PIL.Image.ANTIALIAS)
+        img.paste(watermarkImage, (img.size[0]/2-watermarkImage.size[0]/2, img.size[1]/2-watermarkImage.size[1]/2), watermarkImage)
+        
     img.save('web/'+fileName)
     print " termine !"
